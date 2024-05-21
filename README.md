@@ -1,2 +1,2 @@
 # Mediapipe-_face_recognition
-face recognition using Mediapipe 
+ISpan AIML05 project only, face recognition model 
