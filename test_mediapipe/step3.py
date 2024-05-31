@@ -39,8 +39,8 @@ while True:
         error = np.mean((face_resized - reconstructed) ** 2)
 
         # 在影像上畫框
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-        cv2.putText(frame, f'Error: {error:.2f}', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        cv2.putText(frame, f'MSE: {error:.2f}', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
     # 顯示結果影像
     cv2.imshow('Real-time Face Detection', frame)
