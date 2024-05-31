@@ -13,7 +13,7 @@ face_mesh = mp_face_mesh.FaceMesh()
 # 開啟攝像頭
 cap = cv2.VideoCapture(0)
 
-# 獲取攝像頭的幀寬和幀高
+# 獲取攝像頭的幀寬和幀高w
 frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
 
