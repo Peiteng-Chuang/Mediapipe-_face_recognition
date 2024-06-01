@@ -50,6 +50,21 @@ def calculate_face_width(landmarks):
     
     return face_width, left_face, right_face
 
+def calculate_lip_thick(landmarks):
+    # 嘴唇索引test
+    UPPER_LIP_INDEX = [0,13]
+    LOWER_LIP_INDEX = [14,16]
+    
+    upper_lip = [landmarks[UPPER_LIP_INDEX[0]],landmarks[UPPER_LIP_INDEX[1]]]
+    lower_lip = [landmarks[LOWER_LIP_INDEX[0]],landmarks[LOWER_LIP_INDEX[1]]]
+    
+    # 計算唇部厚度
+    up_lip_thick = math.sqrt((upper_lip[0].x - upper_lip[1].x) ** 2 + (upper_lip[0].y - upper_lip[1].y) ** 2)
+    lo_lip_thick = math.sqrt((lower_lip[0].x - lower_lip[1].x) ** 2 + (lower_lip[0].y - lower_lip[1].y) ** 2)
+    lip_thick = (up_lip_thick + lo_lip_thick)/2
+    return lip_thick,upper_lip, lower_lip
+
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -63,22 +78,24 @@ while cap.isOpened():
     results_face = face_mesh.process(image)
     
     # 繪製姿態估計結果
-    if results_pose.pose_landmarks:
-        mp_drawing.draw_landmarks(frame, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-    
+    # if results_pose.pose_landmarks:
+    #     mp_drawing.draw_landmarks(frame, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+        
     # 計算並顯示眼睛距離和臉寬
     if results_face.multi_face_landmarks:
         for face_landmarks in results_face.multi_face_landmarks:
             eye_distance, left_eye, right_eye = calculate_eye_distance(face_landmarks.landmark)
             face_width, left_face, right_face = calculate_face_width(face_landmarks.landmark)
-            
+            lip_thick,upper_lip, lower_lip = calculate_lip_thick(face_landmarks.landmark)
             # 顯示眼睛距離和臉寬
             cv2.putText(frame,'face_model_v1.0',(10,30),cv2.FONT_HERSHEY_SIMPLEX,1, (0, 0, 255), 2, cv2.LINE_AA)
             cv2.putText(frame, f'Eye Distance: {eye_distance:.2f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             cv2.putText(frame, f'Face Width: {face_width:.2f}', (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'Lip Thick: {lip_thick:.2f}', (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             
             # 畫綠點在眼睛和臉部寬度的點上
-            for point in [left_eye[0], left_eye[1], right_eye[0], right_eye[1], left_face, right_face]:
+            for point in [left_eye[0], left_eye[1], right_eye[0], right_eye[1], left_face, right_face,
+                          upper_lip[0],upper_lip[1],lower_lip[0],lower_lip[1]]:
                 x, y = int(point.x * frame_width), int(point.y * frame_height)
                 cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
     
