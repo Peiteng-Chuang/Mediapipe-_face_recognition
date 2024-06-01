@@ -52,7 +52,7 @@ autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
 autoencoder.summary()
 
 # 訓練模型
-autoencoder.fit(data, data, epochs=50, batch_size=32, validation_split=0.2)
+autoencoder.fit(data, data, epochs=100, batch_size=16, validation_split=0.2)
 
 # 保存模型
 autoencoder.save("face_autoencoder.h5")
