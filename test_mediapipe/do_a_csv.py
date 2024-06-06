@@ -11,28 +11,62 @@ face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refin
 # 特徵索引定義
 LEFT_EYE_INDEX = [33, 133]
 RIGHT_EYE_INDEX = [362, 263]
+
 LEFT_EYE_INNER_INDEX = 133
 RIGHT_EYE_INNER_INDEX = 362
 LEFT_EYE_OUTER_INDEX = 33
 RIGHT_EYE_OUTER_INDEX = 263
-LEFT_BROW_INDEX = [70, 105]
+
+LEFT_BROW_INDEX = [70, 107]
 RIGHT_BROW_INDEX = [336, 300]
+
 NOSE_TIP_INDEX = 1
-NOSE_BOTTOM_INDEX = 4
-LEFT_NOSE_INDEX = 197
-RIGHT_NOSE_INDEX = 429
+NOSE_TOP_INDEX = 168  
+LEFT_NOSE_INDEX = 115
+RIGHT_NOSE_INDEX = 344
+
 UPPER_LIP_INDEX = 13
 LOWER_LIP_INDEX = 14
+
 FACE_WIDTH_INDEX = [234, 454]
 FACE_HEIGHT_INDEX = [10, 152]
+#=================================要抓取xyz軸的landmark=================================
+rightEyeUpper0 =  [246, 161, 160, 159, 158, 157, 173]
+rightEyeLower0 = [33, 7, 163, 144, 145, 153, 154, 155, 133]
+rightEyeLower3 = [143, 111, 117, 118, 119, 120, 121, 128, 245]
+leftEyeUpper0 = [466, 388, 387, 386, 385, 384, 398]
+leftEyeLower0 = [263, 249, 390, 373, 374, 380, 381, 382, 362]
+leftEyeLower3 = [372, 340, 346, 347, 348, 349, 350, 357, 465]
+rightEyebrowLower = [ 124, 46, 53, 52, 65, 193]
+leftEyebrowLower = [265, 353, 276, 283, 282, 295, 285]
+data = {
+    "rightEyeUpper0": rightEyeUpper0,
+    "rightEyeLower0": rightEyeLower0,
+    "rightEyeLower3": rightEyeLower3,
+    "leftEyeUpper0": leftEyeUpper0,
+    "leftEyeLower0": leftEyeLower0,
+    "leftEyeLower3": leftEyeLower3,
+    "rightEyebrowLower": rightEyebrowLower,
+    "leftEyebrowLower": leftEyebrowLower
+}
+result = ['Image', 'Eye Ball Distance', 'Eye Distance', 'Eye Width', 'Face Width', 'Nose Length', 'Nose Width', 
+                    'Lip Thickness', 'Left Brow Width', 'Brow Length', 'Face Length'
+                    ]
+# 处理数据
+for name, values in data.items():
+    for value in values:
+        result.append(f"{name}_{value}_x")
+        result.append(f"{name}_{value}_y")
+        result.append(f"{name}_{value}_z")
 
+#======================================================================================
 # 讀取圖片並擷取特徵值
-image_folder = './test_mediapipe/preprocessed_images'
+image_folder = 'test_mediapipe/256img_lst'
 features = []
 
 for image_name in os.listdir(image_folder):
-    if image_name.endswith('.jpeg'):
-        print(f'{image_name} has found.')
+    if image_name.endswith('.jpg'):
+        
         image_path = os.path.join(image_folder, image_name)
         image = cv2.imread(image_path)
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -53,7 +87,7 @@ for image_name in os.listdir(image_folder):
             right_brow_inner = landmarks[RIGHT_BROW_INDEX[0]]
             right_brow_outer = landmarks[RIGHT_BROW_INDEX[1]]
             nose_tip = landmarks[NOSE_TIP_INDEX]
-            nose_bottom = landmarks[NOSE_BOTTOM_INDEX]
+            nose_top = landmarks[NOSE_TOP_INDEX]
             left_nose = landmarks[LEFT_NOSE_INDEX]
             right_nose = landmarks[RIGHT_NOSE_INDEX]
             upper_lip = landmarks[UPPER_LIP_INDEX]
@@ -68,15 +102,14 @@ for image_name in os.listdir(image_folder):
             eye_ball_distance = get_distance(left_eye_inner, right_eye_inner)
             eye_width = get_distance(left_eye_outer, left_eye_inner)
             face_width = get_distance(face_left, face_right)
-            nose_length = get_distance(nose_tip, nose_bottom)
+            nose_length = get_distance(nose_tip, nose_top)
             nose_width = get_distance(left_nose, right_nose)
             lip_thickness = get_distance(upper_lip, lower_lip)
             left_brow_width = get_distance(left_brow_inner, left_brow_outer)
             right_brow_width = get_distance(right_brow_inner, right_brow_outer)
             brow_length = (left_brow_width + right_brow_width) / 2
             face_length = get_distance(face_top, face_bottom)
-            
-            features.append([
+            x=[
                 image_name, 
                 eye_ball_distance, 
                 eye_distance, 
@@ -88,13 +121,22 @@ for image_name in os.listdir(image_folder):
                 left_brow_width, 
                 brow_length, 
                 face_length
-            ])
+            ]
+            n=[]
+            for name, values in data.items():
+                for value in values:
+                    n.append(landmarks[value].x)
+                    n.append(landmarks[value].y)
+                    n.append(landmarks[value].z)
+            
+            features.append(x+n)
             print(f'{image_name} features has read.')
 
 # 寫入CSV檔案
-with open('face_data.csv', mode='w', newline='') as file:
+with open('test_mediapipe/csv_file/face_data.csv', mode='w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(['Image', 'Eye Ball Distance', 'Eye Distance', 'Eye Width', 'Face Width', 'Nose Length', 'Nose Width', 'Lip Thickness', 'Left Brow Width', 'Brow Length', 'Face Length'])
+    writer.writerow(result)
+    
     writer.writerows(features)
 
 print("Features have been written to face_features.csv")

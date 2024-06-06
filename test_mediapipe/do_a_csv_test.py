@@ -41,7 +41,13 @@ FEATURE_INDEXES = [
 # FEATURE_INDEXES = [70,336,300,107]
 # 讀取圖片
 # image_path = './test_mediapipe/test_image/max.jpg'  # 替换为你的图片路径
-image_path = './test_mediapipe/preprocessed_images/makeup1.jpeg'  # 替换为你的图片路径
+image_path = './test_mediapipe/256img_lst/001.jpg'  # 替换为你的图片路径
+
+def get_xyz(landmark):
+    x=landmark.x
+    y=landmark.y
+    z=landmark.z
+    return x,y,z
 
 image = cv2.imread(image_path)
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -53,6 +59,7 @@ if results.multi_face_landmarks:
         x = int(landmarks[idx].x * image.shape[1])
         y = int(landmarks[idx].y * image.shape[0])
         cv2.circle(image, (x, y), 2, (0, 255, 0), -1)  # 用绿色绘制特征点
+        print(f"{idx}_xyz :x={landmarks[idx].x}/y={landmarks[idx].y}/z={landmarks[idx].z}")
 
 # 顯示圖片
 cv2.imshow('Image with Face Landmarks', image)
