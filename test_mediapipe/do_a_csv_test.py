@@ -40,7 +40,9 @@ FEATURE_INDEXES = [
     ]
 # FEATURE_INDEXES = [70,336,300,107]
 # 讀取圖片
-image_path = 'C:\\Users\\payten\\Desktop\\project_file\\Mediapipe-_face_recognition\\test_mediapipe\\test\\max.jpg'  # 替换为你的图片路径
+# image_path = './test_mediapipe/test_image/max.jpg'  # 替换为你的图片路径
+image_path = './test_mediapipe/preprocessed_images/makeup1.jpeg'  # 替换为你的图片路径
+
 image = cv2.imread(image_path)
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 results = face_mesh.process(image_rgb)

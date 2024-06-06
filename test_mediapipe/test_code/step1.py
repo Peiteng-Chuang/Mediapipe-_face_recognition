@@ -31,7 +31,7 @@ for filename in os.listdir(input_folder):
             face_img = img[y:y+h, x:x+w]
             
             # 調整人臉大小（可選）
-            face_img = cv2.resize(face_img, (64, 64))
+            face_img = cv2.resize(face_img, (256,256))
             
             # 設定輸出影像的檔案路徑
             output_path = os.path.join(output_folder, filename)

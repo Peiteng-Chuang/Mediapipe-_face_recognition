@@ -27,7 +27,7 @@ FACE_WIDTH_INDEX = [234, 454]
 FACE_HEIGHT_INDEX = [10, 152]
 
 # 讀取圖片並擷取特徵值
-image_folder = 'C:\\Users\\payten\\Desktop\\project_file\\Mediapipe-_face_recognition\\test_mediapipe\\preprocessed_images'
+image_folder = './test_mediapipe/preprocessed_images'
 features = []
 
 for image_name in os.listdir(image_folder):
