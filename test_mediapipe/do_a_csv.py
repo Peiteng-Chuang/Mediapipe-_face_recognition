@@ -28,8 +28,13 @@ RIGHT_NOSE_INDEX = 344
 UPPER_LIP_INDEX = 13
 LOWER_LIP_INDEX = 14
 
+UPPER_LIP_INDEX = [0,13]
+LOWER_LIP_INDEX = [14,16]
+
 FACE_WIDTH_INDEX = [234, 454]
 FACE_HEIGHT_INDEX = [10, 152]
+
+
 #=================================要抓取xyz軸的landmark=================================
 rightEyeUpper0 =  [246, 161, 160, 159, 158, 157, 173]
 rightEyeLower0 = [33, 7, 163, 144, 145, 153, 154, 155, 133]
@@ -94,8 +99,12 @@ for image_name in os.listdir(image_folder):
             nose_top = landmarks[NOSE_TOP_INDEX]
             left_nose = landmarks[LEFT_NOSE_INDEX]
             right_nose = landmarks[RIGHT_NOSE_INDEX]
-            upper_lip = landmarks[UPPER_LIP_INDEX]
-            lower_lip = landmarks[LOWER_LIP_INDEX]
+            
+            upper_lip_up = landmarks[UPPER_LIP_INDEX[0]]
+            upper_lip_lo = landmarks[UPPER_LIP_INDEX[1]]
+            lower_lip_up = landmarks[LOWER_LIP_INDEX[0]]
+            lower_lip_lo = landmarks[LOWER_LIP_INDEX[1]]
+            
             face_left = landmarks[FACE_WIDTH_INDEX[0]]
             face_right = landmarks[FACE_WIDTH_INDEX[1]]
             face_top = landmarks[FACE_HEIGHT_INDEX[0]]
@@ -108,7 +117,11 @@ for image_name in os.listdir(image_folder):
             face_width = get_distance(face_left, face_right)
             nose_length = get_distance(nose_tip, nose_top)
             nose_width = get_distance(left_nose, right_nose)
-            lip_thickness = get_distance(upper_lip, lower_lip)
+            
+            lip_up = get_distance(upper_lip_up, upper_lip_lo)
+            lip_lo = get_distance(lower_lip_up, lower_lip_lo)
+            lip_thickness = (lip_up+lip_lo)/2
+            
             left_brow_width = get_distance(left_brow_inner, left_brow_outer)
             right_brow_width = get_distance(right_brow_inner, right_brow_outer)
             brow_length = (left_brow_width + right_brow_width) / 2
@@ -117,7 +130,7 @@ for image_name in os.listdir(image_folder):
                 brow_width=left_brow_width
             else:brow_width=right_brow_width
             
-            standard_value=(1+face_length)*(1+face_width)*5
+            standard_value=18
             
             eye_distance = Coordinate_normalization(eye_distance,standard_value)
             eye_ball_distance = Coordinate_normalization(eye_ball_distance,standard_value)

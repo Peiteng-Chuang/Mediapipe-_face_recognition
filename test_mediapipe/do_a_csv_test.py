@@ -39,7 +39,7 @@ face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refin
 #     0,13,14,16
 #     ]
 
-FEATURE_INDEXES = [70,107]
+FEATURE_INDEXES = [16]
 # 讀取圖片
 image_path = './test_mediapipe/test_image/max.jpg'  # 替换为你的图片路径
 # image_path = './test_mediapipe/256img_lst/001.jpg'  # 替换为你的图片路径
