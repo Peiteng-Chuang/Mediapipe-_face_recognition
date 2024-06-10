@@ -27,21 +27,22 @@ face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refin
 # FACE_HEIGHT_INDEX = [10, 152]     O
 
 # 特徵索引定義
-FEATURE_INDEXES = [
-    33,133,
-    362,263, 
-    344,115,
-    70,107,
-    336,300,
-    168,1,
-    234,454,
-    10,152,
-    0,13,14,16
-    ]
-# FEATURE_INDEXES = [70,336,300,107]
+# FEATURE_INDEXES = [
+#     33,133,
+#     362,263, 
+#     344,115,
+#     70,107,
+#     336,300,
+#     168,1,
+#     234,454,
+#     10,152,
+#     0,13,14,16
+#     ]
+
+FEATURE_INDEXES = [70,107]
 # 讀取圖片
-# image_path = './test_mediapipe/test_image/max.jpg'  # 替换为你的图片路径
-image_path = './test_mediapipe/256img_lst/001.jpg'  # 替换为你的图片路径
+image_path = './test_mediapipe/test_image/max.jpg'  # 替换为你的图片路径
+# image_path = './test_mediapipe/256img_lst/001.jpg'  # 替换为你的图片路径
 
 def get_xyz(landmark):
     x=landmark.x
@@ -58,7 +59,7 @@ if results.multi_face_landmarks:
     for idx in FEATURE_INDEXES:
         x = int(landmarks[idx].x * image.shape[1])
         y = int(landmarks[idx].y * image.shape[0])
-        cv2.circle(image, (x, y), 2, (0, 255, 0), -1)  # 用绿色绘制特征点
+        cv2.circle(image, (x, y), 2, (0, 0, 255), -1)  # 用绿色绘制特征点
         print(f"{idx}_xyz :x={landmarks[idx].x}/y={landmarks[idx].y}/z={landmarks[idx].z}")
 
 # 顯示圖片

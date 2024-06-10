@@ -50,7 +50,7 @@ data = {
     "leftEyebrowLower": leftEyebrowLower
 }
 result = ['Image', 'Eye Ball Distance', 'Eye Distance', 'Eye Width', 'Face Width', 'Nose Length', 'Nose Width', 
-                    'Lip Thickness', 'Left Brow Width', 'Brow Length', 'Face Length'
+                    'Lip Thickness', 'Brow_width', 'Face Length'
                     ]
 # 处理数据
 for name, values in data.items():
@@ -77,6 +77,10 @@ for image_name in os.listdir(image_folder):
             
             def get_distance(point1, point2):
                 return np.linalg.norm(np.array([point1.x, point1.y]) - np.array([point2.x, point2.y]))
+            
+            def Coordinate_normalization(value,standard_value):
+                std_val=standard_value*value    #座標值標準化
+                return std_val
             
             left_eye_inner = landmarks[LEFT_EYE_INNER_INDEX]
             right_eye_inner = landmarks[RIGHT_EYE_INNER_INDEX]
@@ -109,6 +113,22 @@ for image_name in os.listdir(image_folder):
             right_brow_width = get_distance(right_brow_inner, right_brow_outer)
             brow_length = (left_brow_width + right_brow_width) / 2
             face_length = get_distance(face_top, face_bottom)
+            if left_brow_width>=right_brow_width:
+                brow_width=left_brow_width
+            else:brow_width=right_brow_width
+            
+            standard_value=(1+face_length)*(1+face_width)*5
+            
+            eye_distance = Coordinate_normalization(eye_distance,standard_value)
+            eye_ball_distance = Coordinate_normalization(eye_ball_distance,standard_value)
+            eye_width = Coordinate_normalization(eye_width,standard_value)
+            face_width = Coordinate_normalization(face_width,standard_value)
+            nose_length = Coordinate_normalization(nose_length,standard_value)
+            nose_width = Coordinate_normalization(nose_width,standard_value)
+            lip_thickness = Coordinate_normalization(lip_thickness,standard_value)
+            brow_width = Coordinate_normalization(brow_width,standard_value)
+            face_length = Coordinate_normalization(face_length,standard_value)
+            
             x=[
                 image_name, 
                 eye_ball_distance, 
@@ -118,8 +138,8 @@ for image_name in os.listdir(image_folder):
                 nose_length, 
                 nose_width, 
                 lip_thickness, 
-                left_brow_width, 
-                brow_length, 
+                brow_width, 
+                # brow_length, 
                 face_length
             ]
             n=[]
