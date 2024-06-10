@@ -120,7 +120,7 @@ for image_name in os.listdir(image_folder):
             
             lip_up = get_distance(upper_lip_up, upper_lip_lo)
             lip_lo = get_distance(lower_lip_up, lower_lip_lo)
-            lip_thickness = (lip_up+lip_lo)/2
+            lip_thickness = (lip_up+lip_lo)
             
             left_brow_width = get_distance(left_brow_inner, left_brow_outer)
             right_brow_width = get_distance(right_brow_inner, right_brow_outer)
@@ -130,7 +130,7 @@ for image_name in os.listdir(image_folder):
                 brow_width=left_brow_width
             else:brow_width=right_brow_width
             
-            standard_value=18
+            standard_value=256*0.079                      #256像素，0.079/pix
             
             eye_distance = Coordinate_normalization(eye_distance,standard_value)
             eye_ball_distance = Coordinate_normalization(eye_ball_distance,standard_value)
