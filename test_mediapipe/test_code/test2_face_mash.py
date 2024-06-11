@@ -28,13 +28,13 @@ with mp_face_mesh.FaceMesh(
         if results.multi_face_landmarks:
             for face_landmarks in results.multi_face_landmarks:
                 # 繪製網格
-                mp_drawing.draw_landmarks(
-                    image=img,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_TESSELATION,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_tesselation_style())
+                # mp_drawing.draw_landmarks(
+                #     image=img,
+                #     landmark_list=face_landmarks,
+                #     connections=mp_face_mesh.FACEMESH_TESSELATION,
+                #     landmark_drawing_spec=None,
+                #     connection_drawing_spec=mp_drawing_styles
+                #     .get_default_face_mesh_tesselation_style())
                 # 繪製輪廓
                 mp_drawing.draw_landmarks(
                     image=img,
@@ -44,13 +44,13 @@ with mp_face_mesh.FaceMesh(
                     connection_drawing_spec=mp_drawing_styles
                     .get_default_face_mesh_contours_style())
                 # 繪製眼睛
-                mp_drawing.draw_landmarks(
-                    image=img,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_IRISES,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_iris_connections_style())
+                # mp_drawing.draw_landmarks(
+                #     image=img,
+                #     landmark_list=face_landmarks,
+                #     connections=mp_face_mesh.FACEMESH_IRISES,
+                #     landmark_drawing_spec=None,
+                #     connection_drawing_spec=mp_drawing_styles
+                #     .get_default_face_mesh_iris_connections_style())
 
         cv2.imshow('oxxostudio', img)
         if cv2.waitKey(5) == ord('q'):
