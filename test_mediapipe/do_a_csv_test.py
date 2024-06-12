@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
-
+import math
+import numpy as np
 # 初始化MediaPipe Face Mesh
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refine_landmarks=True)
@@ -39,6 +40,7 @@ face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refin
 #     0,13,14,16
 #     ]
 
+
 lip=[146,91,181,84,17,314,
 405,321,375,291,185,40,39,
 37,0,267,269,270,409,291,95,
@@ -50,6 +52,7 @@ lip_u=[0,37,39,40,185,191,80,81,82,13,312,311,310,267,269,270]
 lip_l=[]
 # FEATURE_INDEXES = [16]
 FEATURE_INDEXES = lip_u
+
 # 讀取圖片
 # image_path = './test_mediapipe/test_image/max.jpg'  # 替换为你的图片路径
 image_path = './test_mediapipe/test_image/amy.jpg'  # 替换为你的图片路径
@@ -73,7 +76,6 @@ if results.multi_face_landmarks:
         cv2.circle(image, (x, y), 2, (0, 255, 255), -1)  # 用绿色绘制特征点
         cv2.putText(image, f'{idx}', (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
         print(f"{idx}_xyz :x={landmarks[idx].x}/y={landmarks[idx].y}/z={landmarks[idx].z}")
-
 # 顯示圖片
 cv2.imshow('Image with Face Landmarks', image)
 cv2.waitKey(0)
