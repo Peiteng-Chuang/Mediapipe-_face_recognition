@@ -51,8 +51,9 @@ data = {
     "rightEyebrowLower": rightEyebrowLower,
     "leftEyebrowLower": leftEyebrowLower
 }
-result = ['Image', 'Eye Ball Distance', 'Eye Distance', 'Eye Width', 'Face Width', 'Nose Length', 'Nose Width', 
-          'Lip Thickness', 'Brow_width', 'Face Length', 'Face_area', 'area_rate']
+result = ['Image', "Eye Ball Distance", "Eye Distance", "Eye Width", "Face Width",
+    "Nose Length", "Nose Width", "Lip Thickness", "Brow Width",
+    "Face Length", "Face area", "Area Rate"]
 
 for name, values in data.items():
     for value in values:
@@ -175,6 +176,7 @@ for image_name in os.listdir(image_folder):
                     n.append(landmarks[value].z)
             x.extend(n)
             features.append(x)
+        print(f"{image_name} features append success.")
 
 # 將特徵值寫入CSV文件
 output_csv = 'test_mediapipe/csv_file/face_data_area.csv'
