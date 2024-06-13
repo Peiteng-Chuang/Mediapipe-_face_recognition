@@ -86,7 +86,7 @@ def calculate_area_rate(face_landmarks, image_shape):
     for i, idx in enumerate(silhouette):
         landmarks[i] = (face_landmarks[idx].x * image_shape[1], face_landmarks[idx].y * image_shape[0])
     area = cv2.contourArea(landmarks)
-    area_rate = area / ((256 * face_width) * (256 * face_length)) * 25
+    area_rate = area / ((256 * face_width) * (256 * face_length))
     return area, face_width, face_length, area_rate
 
 def Coordinate_normalization(value, standard_value):
