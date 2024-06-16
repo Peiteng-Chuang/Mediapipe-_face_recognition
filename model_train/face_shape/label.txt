@@ -1,0 +1,6 @@
+round face = 	0	圓形臉
+square face = 	1 	方形臉
+heart face = 	2 	心形臉
+long face = 	3 	長形臉
+oval face = 	4     	橢圓臉
+triangle face = 5 	三角臉 Δ
