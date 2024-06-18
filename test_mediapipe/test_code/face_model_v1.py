@@ -30,10 +30,10 @@ def calculate_eye_distance(landmarks):
     right_eye = [landmarks[RIGHT_EYE_INDEXES[0]], landmarks[RIGHT_EYE_INDEXES[1]]]
     
     # 計算兩眼之間的距離
-    left_eye_center = ((left_eye[0].x + left_eye[1].x) / 2, (left_eye[0].y + left_eye[1].y) / 2)
-    right_eye_center = ((right_eye[0].x + right_eye[1].x) / 2, (right_eye[0].y + right_eye[1].y) / 2)
-    
-    distance = math.sqrt((right_eye_center[0] - left_eye_center[0]) ** 2 + (right_eye_center[1] - left_eye_center[1]) ** 2)
+    left_eye_center = ((left_eye[0].x + left_eye[1].x) / 2, (left_eye[0].y + left_eye[1].y) /2, (left_eye[0].z+left_eye[1].z)/2)
+    right_eye_center = ((right_eye[0].x + right_eye[1].x) / 2, (right_eye[0].y + right_eye[1].y) / 2,(right_eye[0].z+right_eye[1].z)/2)
+    dis_eye=(left_eye_center[2]+right_eye_center[2])*2.14
+    distance = math.sqrt((right_eye_center[0] - left_eye_center[0]) ** 2 + (right_eye_center[1] - left_eye_center[1]) ** 2+(right_eye_center[2] - left_eye_center[2]) ** 2)+dis_eye
     
     return distance, left_eye, right_eye
 
@@ -89,9 +89,10 @@ while cap.isOpened():
             lip_thick,upper_lip, lower_lip = calculate_lip_thick(face_landmarks.landmark)
             # 顯示眼睛距離和臉寬
             cv2.putText(frame,'face_model_v1.0',(10,30),cv2.FONT_HERSHEY_SIMPLEX,1, (0, 0, 255), 2, cv2.LINE_AA)
-            cv2.putText(frame, f'Eye Distance: {eye_distance:.2f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'Eye Distance: {eye_distance:.3f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             cv2.putText(frame, f'Face Width: {face_width:.2f}', (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             cv2.putText(frame, f'Lip Thick: {lip_thick:.2f}', (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'distance: {face_landmarks.landmark[4].z:.5f}', (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
             
             # 畫綠點在眼睛和臉部寬度的點上
             for point in [left_eye[0], left_eye[1], right_eye[0], right_eye[1], left_face, right_face,

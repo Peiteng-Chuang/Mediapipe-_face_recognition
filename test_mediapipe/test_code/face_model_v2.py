@@ -21,34 +21,46 @@ frame_height = int(cap.get(4))
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('output.avi', fourcc, 20.0, (frame_width, frame_height))
 
-def calculate_eye_distance(landmarks):
-    # 眼睛索引
-    LEFT_EYE_INDEXES = [33, 133]
-    RIGHT_EYE_INDEXES = [362, 263]
-    
-    left_eye = [landmarks[LEFT_EYE_INDEXES[0]], landmarks[LEFT_EYE_INDEXES[1]]]
-    right_eye = [landmarks[RIGHT_EYE_INDEXES[0]], landmarks[RIGHT_EYE_INDEXES[1]]]
-    
-    # 計算兩眼之間的距離
-    left_eye_center = ((left_eye[0].x + left_eye[1].x) / 2, (left_eye[0].y + left_eye[1].y) / 2)
-    right_eye_center = ((right_eye[0].x + right_eye[1].x) / 2, (right_eye[0].y + right_eye[1].y) / 2)
-    
-    distance = math.sqrt((right_eye_center[0] - left_eye_center[0]) ** 2 + (right_eye_center[1] - left_eye_center[1]) ** 2)
-    
-    return distance, left_eye, right_eye
+def calculate_a(landmarks):
+    ford_head=landmarks[54,284]
+    fhx0,fhx1=ford_head[0].x,ford_head[1].x
+    fhy0,fhy1=ford_head[0].y,ford_head[1].y
+    fhz0,fhz1=ford_head[0].z+1,ford_head[1].z+1
+    fw_wid=math.sqrt((fhx0 - fhx1) ** 2 + 
+                    (fhy0 - fhy1) ** 2 +
+                    (fhz0 - fhz1))
+    return fw_wid
 
-def calculate_face_width(landmarks):
-    # 臉部寬度索引
-    LEFT_FACE_INDEX = 234
-    RIGHT_FACE_INDEX = 454
+def calculate_b(landmarks):
+    face_width=landmarks[234,454]
+    fwx0,fwx1=face_width[0].x,face_width[1].x
+    fwy0,fwy1=face_width[0].y,face_width[1].y
+    fwz0,fwz1=face_width[0].z+1,face_width[1].z+1
+    fw_wid=math.sqrt((fwx0 - fwx1) ** 2 + 
+                    (fwy0 - fwy1) ** 2 +
+                    (fwz0 - fwz1))
+    return fw_wid
+
+def calculate_c(landmarks):
+    low_jaw=landmarks[172,397]
+    ljx0,ljx1=low_jaw[0].x,low_jaw[1].x
+    ljy0,ljy1=low_jaw[0].y,low_jaw[1].y
+    ljz0,ljz1=low_jaw[0].z+1,low_jaw[1].z+1
+    lj_wid=math.sqrt((ljx0 - ljx1) ** 2 + 
+                    (ljy0 - ljy1) ** 2 +
+                    (ljz0 - ljz1))
+    return lj_wid
+
+def calculate_d(landmarks):
+    face_length=landmarks[175,10]
     
-    left_face = landmarks[LEFT_FACE_INDEX]
-    right_face = landmarks[RIGHT_FACE_INDEX]
-    
-    # 計算臉部寬度
-    face_width = math.sqrt((right_face.x - left_face.x) ** 2 + (right_face.y - left_face.y) ** 2)
-    
-    return face_width, left_face, right_face
+    flx0,flx1=face_length[0].x,face_length[1].x
+    fly0,fly1=face_length[0].y,face_length[1].y
+    flz0,flz1=face_length[0].z+1,face_length[1].z+1
+    fl_wid=math.sqrt((flx0 - flx1) ** 2 + 
+                    (fly0 - fly1) ** 2 +
+                    (flz0 - flz1))
+    return fl_wid
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -69,9 +81,10 @@ while cap.isOpened():
     # 計算並顯示眼睛距離和臉寬
     if results_face.multi_face_landmarks:
         for face_landmarks in results_face.multi_face_landmarks:
-            eye_distance, left_eye, right_eye = calculate_eye_distance(face_landmarks.landmark)
-            face_width, left_face, right_face = calculate_face_width(face_landmarks.landmark)
-            
+            dis_A=calculate_a(face_landmarks.landmark)
+            dis_B=calculate_b(face_landmarks.landmark)
+            dis_C=calculate_c(face_landmarks.landmark)
+            dis_D=calculate_d(face_landmarks.landmark)
             # 顯示眼睛距離和臉寬
             cv2.putText(frame,'face_model_v1.0',(10,30),cv2.FONT_HERSHEY_SIMPLEX,1, (0, 0, 255), 2, cv2.LINE_AA)
             cv2.putText(frame, f'Eye Distance: {eye_distance:.2f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)

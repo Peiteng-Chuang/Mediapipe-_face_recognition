@@ -53,7 +53,8 @@ ford_head=[54,284]
 low_jaw=[172,397]
 jaw=[234,454]
 long=[175,10]
-ff=long+jaw+low_jaw+ford_head
+nose=[4]
+ff=long+jaw+low_jaw+ford_head+nose
 # FEATURE_INDEXES = [16]
 FEATURE_INDEXES = ff
 
@@ -68,6 +69,9 @@ def get_xyz(landmark):
     z=landmark.z
     return x,y,z
 
+def get_distance():
+    return 0
+
 image = cv2.imread(image_path)
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 results = face_mesh.process(image_rgb)
@@ -80,6 +84,8 @@ if results.multi_face_landmarks:
         cv2.circle(image, (x, y), 2, (0, 0, 255), -1)  # 用绿色绘制特征点
         cv2.putText(image, f'{idx}', (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
         print(f"{idx}_xyz :x={landmarks[idx].x}/y={landmarks[idx].y}/z={landmarks[idx].z}")
+    
+    
 # 顯示圖片
 cv2.imshow('Image with Face Landmarks', image)
 cv2.waitKey(0)
