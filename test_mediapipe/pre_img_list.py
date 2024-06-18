@@ -39,7 +39,7 @@ count=1
 format_img='jpg'
 # 迭代處理每張影像
 for filename in os.listdir(input_folder):
-    if filename.endswith(".jpeg"):
+    if filename.endswith(".jpeg") or filename.endswith(".jpg"):
         count_str=str(count)
         while len(count_str)<3:
             count_str="0"+count_str
