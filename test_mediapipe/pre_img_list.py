@@ -2,8 +2,8 @@ from PIL import Image
 import os
 
 # 設定輸入和輸出資料夾路徑
-input_folder = "./test_mediapipe/preprocessed_images"
-output_folder = "./test_mediapipe/256img_lst"
+input_folder = "test_mediapipe/preprocessed_images"
+output_folder = "test_mediapipe/256img_lst"
 
 def save_image_as_new_file_with_pillow(source_path, new_name, new_format):
     # 打开源图像
@@ -48,13 +48,13 @@ for filename in os.listdir(input_folder):
         save_image_as_new_file_with_pillow(s_path,count_str,format_img)
         count+=1
 
-print("all done !")
+print("!  done  !")
 
 
 
 
 # 示例使用
-source_image = 'path/to/source/image.jpeg'
-new_name = 'path/to/destination/001'
-new_format = 'jpg'
-save_image_as_new_file_with_pillow(source_image, new_name, new_format)
+# source_image = 'path/to/source/image.jpeg'
+# new_name = 'path/to/destination/001'
+# new_format = 'jpg'
+# save_image_as_new_file_with_pillow(source_image, new_name, new_format)
