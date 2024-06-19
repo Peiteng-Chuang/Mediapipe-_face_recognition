@@ -4,7 +4,7 @@ import numpy as np
 import math
 #=====================================
 from keras.models import load_model
-
+#=============================================導入模型
 model_path = 'C:/DL_model/best_model.h5'
 model = load_model(model_path)
 input_shape = model.input_shape[1:4]  # 排除批次維度，只取形狀 (height, width, channels)
