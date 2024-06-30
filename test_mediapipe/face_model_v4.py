@@ -286,9 +286,8 @@ while cap.isOpened():
     frame_height, frame_width, _ = frame.shape
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results_face1 = face_mesh1.process(image)
-    #=====================================================================
+    #=====================================================================第一個face_mesh，處理固定照
     
-    #=====================================================================
     if results_face1.multi_face_landmarks:
         for face_landmarks in results_face1.multi_face_landmarks:
             
@@ -299,7 +298,7 @@ while cap.isOpened():
             name_array_cfd = ['ddfl', 'udfl', 'ldfw', 'rdfw']
 
             for index, value in enumerate(array_cfd, start=1):
-                cv2.putText(frame, f'{name_array_cfd[index-1]}={value:.5f}', (400, (index+1)*30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+                cv2.putText(frame, f'{name_array_cfd[index-1]}={value:.3f}', (400, (index+1)*30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             if is_front:cv2.putText(frame, f'check = {error_text[err_code]}', (350, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             else:cv2.putText(frame, f'{error_text[err_code]}', (300, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
             
@@ -309,8 +308,8 @@ while cap.isOpened():
                 monitor_and_capture(frame, face_box)
     if start_countdown:
         current_time = int(3 - (time.time() - countdown_start_time))
-        cv2.putText(frame, f'Capturing in {current_time}', (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-    #======================================================第二個face_mesh2，處理固定照
+        cv2.putText(frame, f'Capturing in {current_time}', (10, 450), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+    #======================================================第二個face_mesh，處理固定照
     captured_face= read_captured_face()
     results_face2 = face_mesh2.process(captured_face)
     if results_face2.multi_face_landmarks:
@@ -321,11 +320,11 @@ while cap.isOpened():
             dis_C, _, _ = calculate_c(face_landmarks.landmark)
             dis_D, _, _ = calculate_d(face_landmarks.landmark)
             face_type = calculate_face_type(dis_A, dis_B, dis_C, dis_D)
-            cv2.putText(frame, f'Face Type : {face_type}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-            cv2.putText(frame, f'A : {dis_A:.3f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            cv2.putText(frame, f'B : {dis_B:.3f}', (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            cv2.putText(frame, f'C : {dis_C:.3f}', (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            cv2.putText(frame, f'D : {dis_D:.3f}', (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'Face Type : {face_type}', (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'A : {dis_A:.2f}', (10, 60),  cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'B : {dis_B:.2f}', (10, 90),  cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'C : {dis_C:.2f}', (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'D : {dis_D:.2f}', (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
     #======================================================
     cv2.imshow('Pose and Face Mesh Estimation', frame)
     if 'face_box' in locals():
