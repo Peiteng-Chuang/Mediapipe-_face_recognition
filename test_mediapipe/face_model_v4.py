@@ -61,10 +61,10 @@ def calculate_d(landmark):
     return fl_wid,dl,dr
 
 def calculate_face_type(dis_A,dis_B,dis_C,dis_D):#以abcd四條線計算臉部分類
-    long_face_gate=1.65
-    AB_rate=1.05
-    BC_rate=1.05
-    if dis_A*AB_rate>dis_B and dis_B>dis_C and dis_D/dis_D<long_face_gate:face_type =0                       # 0 = heart
+    long_face_gate=0.95
+    AB_rate=1.01
+    BC_rate=1.01
+    if dis_A*AB_rate>dis_B and dis_B>dis_C*BC_rate and dis_D/dis_D<long_face_gate:face_type =0                       # 0 = heart
     elif round(dis_B*100)/100==round(dis_C*100)/100 and dis_D/dis_D<long_face_gate:face_type=1               # 1 = square
     elif dis_A*AB_rate<dis_B and dis_C*BC_rate<dis_B and dis_D/dis_D<long_face_gate:face_type=2               # 2 = round
     elif dis_A*AB_rate>dis_B and dis_B>dis_C and dis_D/dis_D>=long_face_gate:face_type =3                    # 3 = diamond
@@ -218,7 +218,7 @@ def get_rotated_face_box_and_aligned_1(frame, face_landmarks):
     return aligned_face_resized, box
 
 #正方形版
-def get_rotated_face_box_and_aligned(frame, face_landmarks):
+def get_rotated_face_box_and_aligned_2(frame, face_landmarks):
     height, width, _ = frame.shape
 
     # 使用 landmark[175] 和 landmark[10] 校准人脸角度
@@ -262,6 +262,70 @@ def get_rotated_face_box_and_aligned(frame, face_landmarks):
 
     # 裁剪旋转后的人脸区域，并调整大小为256x256
     rotated_face_crop = rotated_frame[face_box_min[1]:face_box_max[1], face_box_min[0]:face_box_max[0]]
+    aligned_face_resized = cv2.resize(rotated_face_crop, (256, 256))
+
+    # 计算旋转后人脸框的顶点坐标
+    rect = ((center_x, center_y), (face_size, face_size), angle)
+    box = cv2.boxPoints(rect)
+    box = np.int0(box)
+
+    return aligned_face_resized, box
+
+def get_rotated_face_box_and_aligned(frame, face_landmarks):
+    height, width, _ = frame.shape
+
+    # 使用 landmark[175] 和 landmark[10] 校准人脸角度
+    jaw_point = face_landmarks.landmark[175]
+    forehead_point = face_landmarks.landmark[10]
+    jaw_x, jaw_y = int(jaw_point.x * width), int(jaw_point.y * height)
+    forehead_x, forehead_y = int(forehead_point.x * width), int(forehead_point.y * height)
+
+    angle = np.arctan2(jaw_y - forehead_y, jaw_x - forehead_x) * 180 / np.pi - 90
+
+    # 计算人脸框的四个顶点
+    x_min = width
+    y_min = height
+    x_max = y_max = 0
+
+    for lm in face_landmarks.landmark:
+        x, y = int(lm.x * width), int(lm.y * height)
+        if x < x_min: x_min = x
+        if y < y_min: y_min = y
+        if x > x_max: x_max = x
+        if y > y_max: y_max = y
+
+    # 计算人脸框的中心点
+    center_x, center_y = (x_min + x_max) // 2, (y_min + y_max) // 2
+
+    # 构建旋转矩阵
+    M = cv2.getRotationMatrix2D((center_x, center_y), angle, 1)
+
+    # 对原图进行旋转
+    rotated_frame = cv2.warpAffine(frame, M, (width, height))
+
+    # 根据旋转后的人脸框尺寸调整为正方形
+    face_width = x_max - x_min
+    face_height = y_max - y_min
+    face_size = max(face_width, face_height)
+
+    # 计算正方形区域的左上角和右下角坐标
+    face_center = ((x_min + x_max) // 2, (y_min + y_max) // 2)
+    face_box_min = (int(face_center[0] - face_size // 2), int(face_center[1] - face_size // 2))
+    face_box_max = (int(face_center[0] + face_size // 2), int(face_center[1] + face_size // 2))
+
+    # 確保裁剪邊界在圖像範圍內
+    face_box_min = (max(face_box_min[0], 0), max(face_box_min[1], 0))
+    face_box_max = (min(face_box_max[0], width), min(face_box_max[1], height))
+
+    # 裁剪旋转后的人脸区域
+    rotated_face_crop = rotated_frame[face_box_min[1]:face_box_max[1], face_box_min[0]:face_box_max[0]]
+
+    # 檢查裁剪後的圖像是否有效
+    if rotated_face_crop is None or rotated_face_crop.size == 0:
+        print("Error: rotated_face_crop is empty or invalid.")
+        return None, None
+
+    # 調整大小為256x256
     aligned_face_resized = cv2.resize(rotated_face_crop, (256, 256))
 
     # 计算旋转后人脸框的顶点坐标
@@ -320,7 +384,7 @@ while cap.isOpened():
             dis_C, _, _ = calculate_c(face_landmarks.landmark)
             dis_D, _, _ = calculate_d(face_landmarks.landmark)
             face_type = calculate_face_type(dis_A, dis_B, dis_C, dis_D)
-            cv2.putText(frame, f'Face Type : {face_type}', (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'Face Type : {face_type}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
             cv2.putText(frame, f'A : {dis_A:.2f}', (10, 60),  cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
             cv2.putText(frame, f'B : {dis_B:.2f}', (10, 90),  cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
             cv2.putText(frame, f'C : {dis_C:.2f}', (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
@@ -338,86 +402,3 @@ while cap.isOpened():
 
 cap.release()
 cv2.destroyAllWindows()
-
-
-#我的版本
-# while cap.isOpened():
-#     ret, frame = cap.read()
-#     if not ret:
-#         break
-    
-#     frame = cv2.flip(frame, 1)
-#     frame_height, frame_width, _ = frame.shape
-#     # 将影像转换为 RGB 格式
-#     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#     # 将影像输入 mediapipe
-#     results_face = face_mesh.process(image)
-    
-#     # 计算并显示眼睛距离和脸宽
-#     if results_face.multi_face_landmarks:
-#         for face_landmarks in results_face.multi_face_landmarks:
-#             dis_A, al, ar = calculate_a(face_landmarks.landmark)
-#             dis_B, bl, br = calculate_b(face_landmarks.landmark)
-#             dis_C, cl, cr = calculate_c(face_landmarks.landmark)
-#             dis_D, dl, dr = calculate_d(face_landmarks.landmark)
-            
-#             # 获取人脸框和对齐后的人脸图像
-#             face_box, left, top, right, bottom = get_face_box_and_aligned(frame.copy(), face_landmarks)
-            
-#             # 判斷臉型
-#             face_type = calculate_face_type(dis_A, dis_B, dis_C, dis_D)
-            
-#             draw_point = [al, ar, bl, br, cl, cr, dl, dr]
-#             # 顯示眼睛距離和臉寬
-#             cv2.putText(frame, f'Face Type : {face_type}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-#             cv2.putText(frame, f'A : {dis_A:.4f}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-#             cv2.putText(frame, f'B : {dis_B:.4f}', (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-#             cv2.putText(frame, f'C : {dis_C:.4f}', (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-#             cv2.putText(frame, f'D : {dis_D:.4f}', (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            
-#             array_cfd, is_front, err_code = check_face_direction(face_landmarks.landmark)
-            
-#             # 更新全局 err_code
-#             global_err_code = err_code
-            
-#             error_text = ['Good', 'Turn >', 'Turn <', 'Turn ^', 'Turn v', 'Turn ^>', 'Turn <^', 'Turn v>', 'Turn <v', 'unexpected error']
-#             name_array_cfd = ['ddfl', 'udfl', 'ldfw', 'rdfw']
-            
-#             for index, value in enumerate(array_cfd, start=1):
-#                 cv2.putText(frame, f'{name_array_cfd[index-1]}={value:.5f}', (400, (index+1)*30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-            
-#             if is_front:
-#                 cv2.putText(frame, f'check = {error_text[err_code]}', (350, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-#             else:
-#                 cv2.putText(frame, f'{error_text[err_code]}', (300, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-            
-            
-            
-#             # 绘制矩形框
-#             color = (0, 255, 0) if err_code == 0 else (0, 0, 255)
-#             cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
-            
-#             # 检查 err_code 并启动倒计时拍照线程
-#             if err_code == 0:
-#                 monitor_and_capture(frame, face_box)
-    
-#     # 显示倒计时信息
-#     if start_countdown:
-#         current_time = int(3 - (time.time() - countdown_start_time))
-#         cv2.putText(frame, f'Capturing in {current_time}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-    
-#     # 显示结果影像
-#     cv2.imshow('Pose and Face Mesh Estimation', frame)
-#     # 显示裁剪后的人脸图像
-#     if 'face_box' in locals():
-#         cv2.imshow('Face Crop', face_box)
-    
-#     # 等待按键输入
-#     if cv2.waitKey(30) & 0xFF == ord('q'):
-#         print("Detected 'q' key press. Exiting loop.")
-#         break
-
-# # 释放资源
-# cap.release()
-# cv2.destroyAllWindows()
-#=============================================================================================still work but stop now
