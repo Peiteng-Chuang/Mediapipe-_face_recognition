@@ -171,54 +171,8 @@ def monitor_and_capture(frame, face_box):
         countdown_start_time = time.time()
         threading.Thread(target=countdown_and_capture, args=(frame, face_box)).start()
 
-#長方形版
+#正方形版(邊緣錯誤)
 def get_rotated_face_box_and_aligned_1(frame, face_landmarks):
-    height, width, _ = frame.shape
-
-    # 使用 landmark[175] 和 landmark[10] 校准人脸角度
-    jaw_point = face_landmarks.landmark[175]
-    forehead_point = face_landmarks.landmark[10]
-    jaw_x, jaw_y = int(jaw_point.x * width), int(jaw_point.y * height)
-    forehead_x, forehead_y = int(forehead_point.x * width), int(forehead_point.y * height)
-
-    angle = np.arctan2(jaw_y - forehead_y, jaw_x - forehead_x) * 180 / np.pi - 90
-
-    # 计算人脸框的四个顶点
-    x_min = width
-    y_min = height
-    x_max = y_max = 0
-
-    for lm in face_landmarks.landmark:
-        x, y = int(lm.x * width), int(lm.y * height)
-        if x < x_min: x_min = x
-        if y < y_min: y_min = y
-        if x > x_max: x_max = x
-        if y > y_max: y_max = y
-
-    # 计算人脸框的中心点
-    center_x, center_y = (x_min + x_max) // 2, (y_min + y_max) // 2
-
-    # 构建旋转矩阵
-    M = cv2.getRotationMatrix2D((center_x, center_y), angle, 1)
-
-    # 对原图进行旋转
-    rotated_frame = cv2.warpAffine(frame, M, (width, height))
-
-    # 根据人脸框在旋转后的图像中裁剪人脸区域
-    rotated_face_crop = rotated_frame[y_min:y_max, x_min:x_max]
-
-    # 调整大小为256x256
-    aligned_face_resized = cv2.resize(rotated_face_crop, (256, 256))
-
-    # 计算旋转后人脸框的顶点坐标
-    rect = ((center_x, center_y), (x_max - x_min, y_max - y_min), angle)
-    box = cv2.boxPoints(rect)
-    box = np.int0(box)
-
-    return aligned_face_resized, box
-
-#正方形版
-def get_rotated_face_box_and_aligned_2(frame, face_landmarks):
     height, width, _ = frame.shape
 
     # 使用 landmark[175] 和 landmark[10] 校准人脸角度
@@ -271,6 +225,7 @@ def get_rotated_face_box_and_aligned_2(frame, face_landmarks):
 
     return aligned_face_resized, box
 
+#正方形版(邊緣修正)
 def get_rotated_face_box_and_aligned(frame, face_landmarks):
     height, width, _ = frame.shape
 
@@ -376,6 +331,7 @@ while cap.isOpened():
     #======================================================第二個face_mesh，處理固定照
     captured_face= read_captured_face()
     results_face2 = face_mesh2.process(captured_face)
+    
     if results_face2.multi_face_landmarks:
         for face_landmarks in results_face2.multi_face_landmarks:
             
@@ -402,3 +358,5 @@ while cap.isOpened():
 
 cap.release()
 cv2.destroyAllWindows()
+face_mesh1.close()
+face_mesh2.close()
